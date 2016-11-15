@@ -3,4 +3,4 @@ Distributed Sync docker hub (or other registry) public images to third party reg
 
 
 
-Use Task Queue to pull image and push image.
+
