@@ -1,0 +1,3 @@
+redis-py
+huey
+requests
