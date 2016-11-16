@@ -6,7 +6,7 @@ from dockerhub import DockerHubClient
 from settings import (LIBRARY_IMAGE_LIST_PATH,
                       DOCKER_REGISTRY_API,
                       TARGET_REGISTRY_API,
-                      TARGET_REGISTRY_ENDPOINT,
+                      TARGET_REGISTRY,
                       THIRD_PARTY_LIST_PATH,
                       TARGET_THIRD_PARTY_NAMESPACE,
                       IMAGE_NAME_CONVERT_LIST_PATH)
@@ -77,12 +77,12 @@ def sync_image_from_dockerhub(image_name):
     for update_tag in list(new_add_tags | new_updated_tags):
         src_image = "{}:{}".format(name, update_tag) if namespace == 'library' else "{}/{}:{}".format(namespace, name,
                                                                                                       update_tag)
-        dst_image = "{}/{}/{}:{}".format(TARGET_REGISTRY_ENDPOINT, target_namespace, target_name, update_tag)
+        dst_image = "{}/{}/{}:{}".format(TARGET_REGISTRY, target_namespace, target_name, update_tag)
         blueprint = create_sync_blue_print(src_image, dst_image)
         sync_image(blueprint)
 
         if namespace == 'library':
-            dst_image_2 = "{}/{}:{}".format(TARGET_REGISTRY_ENDPOINT, target_name, update_tag)
+            dst_image_2 = "{}/{}:{}".format(TARGET_REGISTRY, target_name, update_tag)
             blueprint2 = create_sync_blue_print(src_image, dst_image_2)
             sync_image(blueprint2)
 
