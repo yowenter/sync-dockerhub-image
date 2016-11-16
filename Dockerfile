@@ -14,4 +14,4 @@ COPY ./requirements.txt /usr/src/app/
 RUN pip install  -r /usr/src/app/requirements.txt
 COPY . /usr/src/app
 
-CMD ["sh","consumer.sh"]
+CMD ["sh","sync_docker/consumer.sh"]
