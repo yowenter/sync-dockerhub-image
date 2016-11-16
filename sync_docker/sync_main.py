@@ -1,5 +1,7 @@
 import logging
 import requests
+from huey import crontab
+from app import docker_huey
 from dockerhub import DockerHubClient
 from settings import (LIBRARY_IMAGE_LIST_PATH,
                       DOCKER_REGISTRY_API,
@@ -116,11 +118,13 @@ def _convert_image(image_name):
         return namespace, name
 
 
+@docker_huey.periodic_task(crontab(hour=0))
 def sync_all_library_images():
     image_list = read_from_file(LIBRARY_IMAGE_LIST_PATH)
     map(sync_image_from_dockerhub, image_list)
 
 
+@docker_huey.periodic_task(crontab(hour=20))
 def sync_all_third_party_images():
     third_party_image_list = read_from_file(THIRD_PARTY_LIST_PATH)
     map(sync_image_from_dockerhub, third_party_image_list)
