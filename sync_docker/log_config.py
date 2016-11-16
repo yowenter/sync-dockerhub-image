@@ -10,7 +10,7 @@ logging_config = dict(
     version=1,
     formatters={
         'f': {'format':
-                  '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
+                  '%(asctime)s %(filename)s - %(levelname) - 5s %(message)s'}
     },
     handlers={
         'h': {'class': 'logging.StreamHandler',
@@ -26,4 +26,3 @@ logging_config = dict(
 dictConfig(logging_config)
 
 logger = logging.getLogger()
-logger.debug('often makes a very good meal of %s', 'visiting tourists')
