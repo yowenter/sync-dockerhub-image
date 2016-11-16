@@ -1,1 +1,21 @@
-tutum/mysql-> daocloud/mysql-test
+graylog2/allinone -> daocloud/graylog2
+graylog2/server -> daocloud/graylog2-server
+sameersbn/gitlab -> daocloud/sameersbn-gitlab
+tutum/mysql -> daocloud/mysql-ha
+bijukunjummen/rabbitmq-server -> daocloud/rabbitmq-ha-server
+sequenceiq/spark -> daocloud/spark
+ceph/daemon -> daocloud/ceph
+jboss/wildfly -> daocloud/jboss-wildfly
+jboss/base-jdk -> daocloud/jboss-base-jdk
+tutum/grafana -> daocloud/tutum-grafana
+tutum/influxdb -> daocloud/tutum-influxdb
+jupyter/minimal-notebook -> daocloud/jupyter-notebook
+metabase/metabase -> daocloud/metabase
+amancevice/caravel -> daocloud/caravel
+tensorflow/tensorflow -> daocloud/tensorflow
+codenvy/che -> daocloud/che
+gitlab/gitlab-ce -> daocloud/gitlab
+discourse/discourse -> daocloud/discourse
+gogs/gogs -> daocloud/gogs
+audreyt/ethercalc -> daocloud/ethercalc
+phpmyadmin/phpmyadmin -> daocloud/phpmyadmin

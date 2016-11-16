@@ -1,3 +1,61 @@
 # os
+ubuntu
 busybox
+debian
+fedora
+centos
+scratch
+alpine
+opensuse
 
+# programming language
+node
+rails
+python
+golang
+java
+ruby
+php
+django
+websphere-liberty
+maven
+gcc
+erlang
+
+# service
+redis
+mongo
+mysql
+nginx
+httpd
+postgres
+registry
+rabbitmq
+tomcat
+haproxy
+cassandra
+influxdb
+logstash
+elasticsearch
+zookeeper
+rethinkdb
+jenkins
+memcached
+
+# popular application
+wordpress
+ghost
+swarm
+docker
+kibana
+redmine
+drupal
+odoo
+owncloud
+piwik
+consul
+crate
+notary
+django
+kong
+mono
