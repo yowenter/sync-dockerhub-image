@@ -1,20 +1,18 @@
 version: "2"
 
 services:
-  app:
-    image: daocloud.io/airywenter/sync-dockerhub
-    environment:
-    - REDIS_URL = redis://redis:6379/0
-
-
   redis:
     image: daocloud.io/daocloud/dao-redis:master-init
     environment:
     - REDIS_PASS=**None**
 
-
   worker:
     image: daocloud.io/airywenter/sync-dockerhub
+    environment:
+    - TARGET_REGISTRY_API=http://localhost:5000/v2
+    - TARGET_REGISTRY=localhost:5000
+    - REDIS_URL=redis://localhost:6379/0
+    - PROD=1
 
     volumes:
     - /usr/bin/docker:/usr/bin/docker
@@ -22,6 +20,3 @@ services:
 
 
 
-networks:
-  sync-dockerhub:
-    driver: overlay

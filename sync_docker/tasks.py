@@ -7,7 +7,7 @@ RUN = 'running'
 LOG = logging.getLogger(__name__)
 
 
-@docker_huey.task(retries=6, retry_delay=30)
+@docker_huey.task(retries=3, retry_delay=60)
 def sync_image(blue_print):
     blue_print.start()
 

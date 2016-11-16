@@ -47,8 +47,9 @@ def sync_image_from_dockerhub(image_name):
     target_docker_hub_client = DockerHubClient(TARGET_REGISTRY_API)
 
     target_namespace, target_name = _convert_image(image_name)
+    LOG.info("src_image: %s/%s, target_image: %s/%s", namespace, name, target_namespace, target_name)
     if target_namespace != 'library' and target_namespace != TARGET_THIRD_PARTY_NAMESPACE:
-        LOG.warning("third party image has no namespace %s", image_name)
+        LOG.warning("third party image %s has no namespace", image_name)
         return
 
     try:
@@ -125,8 +126,6 @@ def sync_all_third_party_images():
     map(sync_image_from_dockerhub, third_party_image_list)
 
 
-
-
 def test_create():
     blueprint = create_sync_blue_print('ubuntu:14.04', '10.1.4.167:5000/library/ubuntu:latest')
     sync_image(blueprint)
@@ -134,4 +133,6 @@ def test_create():
 
 
 if __name__ == '__main__':
-    test_create()
+    # sync_all_library_images()
+    # test_create()
+    sync_all_third_party_images()
