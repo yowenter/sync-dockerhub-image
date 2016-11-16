@@ -55,7 +55,7 @@ def sync_image_from_dockerhub(image_name):
         return
 
     try:
-        target_tags = target_docker_hub_client.tags(target_namespace, target_name).get("tags", [])
+        target_tags = target_docker_hub_client.tags(target_namespace, target_name).get("tags", []) or []
     except  requests.exceptions.HTTPError as e:
         target_tags = []
 
