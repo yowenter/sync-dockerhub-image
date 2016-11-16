@@ -1,5 +1,6 @@
+import requests
 from dockerhub import DockerHubClient
-
+from app import docker_huey
 from settings import LIBRARY_IMAGE_LIST_PATH, DOCKER_REGISTRY_API, TARGET_REGISTRY_API, TARGET_REGISTRY_ENDPOINT
 from tasks import create_sync_blue_print, sync_image
 
@@ -37,7 +38,11 @@ def sync_library():
         tag_manifests = dict(zip(tags, manifests))
 
         target_docker_hub_client = DockerHubClient(TARGET_REGISTRY_API)
-        target_tags = target_docker_hub_client.tags(namespace, name).get("tags", [])
+        try:
+
+            target_tags = target_docker_hub_client.tags(namespace, name).get("tags", [])
+        except  requests.exceptions.HTTPError as e:
+            target_tags = []
         target_manifests = [docker_hub_client.manifests(namespace, name, tag) for tag in target_tags]
         target_tag_manifests = dict(zip(target_tags, target_manifests))
 
@@ -60,5 +65,10 @@ def sync_library():
             sync_image(blueprint)
 
 
+def test_create():
+    blueprint = create_sync_blue_print('busybox:latest', '10.1.4.167:5000/library/busybox:latest')
+    sync_image(blueprint)
+
+
 if __name__ == '__main__':
-    sync_library()
+    test_create()

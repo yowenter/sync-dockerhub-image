@@ -99,6 +99,6 @@ class DockerHubClient(requests.Session):
         """Prepare the kwargs for an HTTP request by inserting the timeout
         parameter, if not already present."""
         kwargs.setdefault('timeout', self._timeout)
-        kwargs.setdefault('verify', False)
+        kwargs.setdefault('verify', True)
         kwargs.setdefault('headers', self._headers)
         return kwargs

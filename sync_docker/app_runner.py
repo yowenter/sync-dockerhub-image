@@ -1,7 +1,7 @@
 
 
 
-from tasks import sync_image
+import tasks
 from app import docker_huey
 
 
