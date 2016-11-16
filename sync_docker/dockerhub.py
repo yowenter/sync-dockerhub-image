@@ -1,15 +1,27 @@
+import requests
 
 
 
-class DockerHubClient:
+class DockerHubClient(requests.Session):
 
 	def __init__(self):
 		pass
 
 
 
-	def repo_manifests(self,repo_namespace,repo_name):
+	def manifests(self,namespace,name):
 		pass
+
+
+	def tags(self,namespace,name):
+		pass
+
+
+
+	@classmethod(function)
+	def parse_repo(repo):
+		pass
+		
 
 
 

@@ -1,28 +1,20 @@
+import subprocess
 
 
-class DockerImageClient:
+class DockerClient:
 
+	@staticmethod
+    def pull(image_name):
+        result = subprocess.call(["docker", "pull", image_name])
+        return True if result == 0 else False
 
-	def __init__(self):
-		pass
+    @staticmethod
+    def push(image_name):
+        result = subprocess.call(["docker", "push", image_name])
+        return True if result == 0 else False
 
-
-
-	def pull(self,image_name):
-		pass
-
-
-
-	def push(self,image_name):
-		pass
-
-
-
-	def tag(self,src_image_name,dst_image_name):
-		pass
-
-
-
-
-
-		
+    @staticmethod
+    def tag( src_image_name, dst_image_name):
+        result = subprocess.call(
+            ["docker", "tag", src_image_name, dst_image_name])
+        return True if result == 0 else False

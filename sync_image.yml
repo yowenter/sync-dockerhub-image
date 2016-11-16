@@ -1,0 +1,27 @@
+version: "2"
+
+services:
+  app:
+    image: daocloud.io/airywenter/sync-dockerhub
+    environment:
+    - REDIS_URL = redis://redis:6379/0
+
+
+  redis:
+    image: daocloud.io/daocloud/dao-redis:master-init
+    environment:
+    - REDIS_PASS=**None**
+
+
+  worker:
+    image: daocloud.io/airywenter/sync-dockerhub
+
+    volumes:
+    - /usr/bin/docker:/usr/bin/docker
+    - /var/run/docker.sock:/var/run/docker.sock
+
+
+
+networks:
+  sync-dockerhub:
+    driver: overlay

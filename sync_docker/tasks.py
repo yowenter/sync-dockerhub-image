@@ -1,7 +1,7 @@
 from app import docker_huey
 
 
-@docker_huey.task(retries=6, retry_delay=10)
+@docker_huey.task(retries=6, retry_delay=30)
 def sync_image():
     pass
 
@@ -25,9 +25,6 @@ class BluePrint(object):
 
 class Step(object):
 
-    def __init__(self, name):
-        self.name = name
-
     def start(self):
         pass
 
@@ -40,5 +37,9 @@ class PullStep(Step):
 class PushStep(Step):
 	pass
 
+
+
+class TagStep(Step):
+	pass
 
 
