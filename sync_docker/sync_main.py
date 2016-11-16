@@ -73,7 +73,7 @@ def sync_image_from_dockerhub(image_name):
 
         if not equal_manifests(a_tag_manifests, b_tag_manifests):
             new_updated_tags.add(tag)
-
+    LOG.info("Update Image %s/%s , tags:%s", target_namespace, target_name, list(new_add_tags | new_updated_tags))
     for update_tag in list(new_add_tags | new_updated_tags):
         src_image = "{}:{}".format(name, update_tag) if namespace == 'library' else "{}/{}:{}".format(namespace, name,
                                                                                                       update_tag)
