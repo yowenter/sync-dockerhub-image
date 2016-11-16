@@ -1,6 +1,7 @@
 
 #!/bin/bash
-set -x
+cd sync_docker
+echo `pwd`
 echo "HUEY CONSUMER"
 echo "-------------"
 echo "Stop the consumer using Ctrl+C"
