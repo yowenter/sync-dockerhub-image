@@ -1,7 +1,10 @@
+import logging
 from app import docker_huey
 from docker_image import DockerClient
 
 RUN = 'running'
+
+LOG = logging.getLogger(__name__)
 
 
 @docker_huey.task(retries=6, retry_delay=30)
@@ -19,9 +22,11 @@ class BluePrint(object):
 
     def start(self):
         self.state = RUN
+        LOG.info("BluePrint %s started", self.steps)
         for i, step in enumerate(self.steps):
             self.started = i + 1
             step.start()
+            LOG.debug("BluePrint step  %s, %s  ", step, i)
 
 
 class Step(object):
@@ -44,15 +49,19 @@ class PullStep(Step):
     def start(self):
         DockerClient.pull(self.image_name)
 
+    def __repr__(self):
+        return "Pull Image %s " % self.image_name
+
 
 class PushStep(Step):
     def __init__(self, image_name):
-
         self.image_name = image_name
 
+    def start(self):
+        DockerClient.push(self.image_name)
 
-def start(self):
-    DockerClient.push(self.image_name)
+    def __repr__(self):
+        return "Push Image %s " % self.image_name
 
 
 class TagStep(Step):
@@ -62,6 +71,9 @@ class TagStep(Step):
 
     def start(self):
         DockerClient.tag(self.src_image, self.dst_image)
+
+    def __repr__(self):
+        return "Tag Image %s -> %s " % (self.src_image, self.dst_image)
 
 
 def create_sync_blue_print(src_image, dst_image):
