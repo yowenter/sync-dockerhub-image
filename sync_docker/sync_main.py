@@ -59,7 +59,7 @@ def sync_image_from_dockerhub(image_name):
     except  requests.exceptions.HTTPError as e:
         target_tags = []
 
-    target_manifests = [docker_hub_client.manifests(target_namespace, target_name, tag) for tag in target_tags]
+    target_manifests = [target_docker_hub_client.manifests(target_namespace, target_name, tag) for tag in target_tags]
     target_tag_manifests = dict(zip(target_tags, target_manifests))
 
     new_add_tags = set(tags) - set(target_tags)
