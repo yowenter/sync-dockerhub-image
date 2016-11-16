@@ -11,8 +11,12 @@ TARGET_REGISTRY_API = os.getenv("TARGET_REGISTRY_API", "http://10.1.4.167:5000/v
 
 TARGET_REGISTRY_ENDPOINT = os.getenv("TARGET_REGISTRY", "10.1.4.167:5000")
 
-IMAGES_DIR = os.getenv("IMAGES", os.path.join(os.path.dirname(os.path.dirname(__file__)), "images"))
+IMAGES_DIR = os.getenv("IMAGES_DIR", os.path.join(os.path.dirname(os.path.dirname(__file__)), "images"))
 
 LIBRARY_IMAGE_LIST_PATH = os.path.join(IMAGES_DIR, 'image.list')
+THIRD_PARTY_LIST_PATH = os.path.join(IMAGES_DIR, 'third_party.list')
+IMAGE_NAME_CONVERT_LIST_PATH = os.path.join(IMAGES_DIR, 'image_name_convert.list')
 
 PROD = str(os.getenv("PROD")) in ('yes', '1', 'true', 'True')
+
+TARGET_THIRD_PARTY_NAMESPACE = os.getenv("TARGET_THIRD_PARTY_NAMESPACE", "daocloud")

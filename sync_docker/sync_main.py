@@ -1,7 +1,14 @@
 import logging
 import requests
 from dockerhub import DockerHubClient
-from settings import LIBRARY_IMAGE_LIST_PATH, DOCKER_REGISTRY_API, TARGET_REGISTRY_API, TARGET_REGISTRY_ENDPOINT
+from settings import (LIBRARY_IMAGE_LIST_PATH,
+                      DOCKER_REGISTRY_API,
+                      TARGET_REGISTRY_API,
+                      TARGET_REGISTRY_ENDPOINT,
+                      THIRD_PARTY_LIST_PATH,
+                      TARGET_THIRD_PARTY_NAMESPACE,
+                      IMAGE_NAME_CONVERT_LIST_PATH)
+
 from tasks import create_sync_blue_print, sync_image
 
 LOG = logging.getLogger(__name__)
@@ -29,45 +36,95 @@ def equal_manifests(a_manifests, b_manifests):
     return True
 
 
-def sync_library():
-    library_images = read_from_file(LIBRARY_IMAGE_LIST_PATH)
-    for image in library_images:
-        endpoint, namespace, name, tag = DockerHubClient.parse_repo(image)
+def sync_image_from_dockerhub(image_name):
+    _, namespace, name, _ = DockerHubClient.parse_repo(image_name)
 
-        docker_hub_client = DockerHubClient(DOCKER_REGISTRY_API)
-        tags = docker_hub_client.tags(namespace, name).get("tags", [])
-        manifests = [docker_hub_client.manifests(namespace, name, tag) for tag in tags]
-        tag_manifests = dict(zip(tags, manifests))
+    docker_hub_client = DockerHubClient(DOCKER_REGISTRY_API)
+    tags = docker_hub_client.tags(namespace, name).get("tags", [])
+    manifests = [docker_hub_client.manifests(namespace, name, tag) for tag in tags]
+    tag_manifests = dict(zip(tags, manifests))
 
-        target_docker_hub_client = DockerHubClient(TARGET_REGISTRY_API)
-        try:
-            target_tags = target_docker_hub_client.tags(namespace, name).get("tags", [])
-        except  requests.exceptions.HTTPError as e:
-            target_tags = []
+    target_docker_hub_client = DockerHubClient(TARGET_REGISTRY_API)
 
-        target_manifests = [docker_hub_client.manifests(namespace, name, tag) for tag in target_tags]
-        target_tag_manifests = dict(zip(target_tags, target_manifests))
+    target_namespace, target_name = _convert_image(image_name)
+    if target_namespace != 'library' and target_namespace != TARGET_THIRD_PARTY_NAMESPACE:
+        LOG.warning("third party image has no namespace %s", image_name)
+        return
 
-        new_add_tags = set(tags) - set(target_tags)
-        new_updated_tags = set()
+    try:
+        target_tags = target_docker_hub_client.tags(target_namespace, target_name).get("tags", [])
+    except  requests.exceptions.HTTPError as e:
+        target_tags = []
 
-        need_compare_tags = set(tags) & set(target_tags)
+    target_manifests = [docker_hub_client.manifests(target_namespace, target_name, tag) for tag in target_tags]
+    target_tag_manifests = dict(zip(target_tags, target_manifests))
 
-        for tag in need_compare_tags:
-            a_tag_manifests = tag_manifests.get(tag, {})
-            b_tag_manifests = target_tag_manifests.get(tag, {})
+    new_add_tags = set(tags) - set(target_tags)
+    new_updated_tags = set()
 
-            if not equal_manifests(a_tag_manifests, b_tag_manifests):
-                new_updated_tags.add(tag)
+    need_compare_tags = set(tags) & set(target_tags)
 
-        for update_tag in list(new_add_tags | new_updated_tags):
-            src_image = "{}:{}".format(name, update_tag)
-            dst_image = "{}/library/{}:{}".format(TARGET_REGISTRY_ENDPOINT, name, update_tag)
-            dst_image_2 = "{}/{}:{}".format(TARGET_REGISTRY_ENDPOINT, name, update_tag)
-            blueprint = create_sync_blue_print(src_image, dst_image)
+    for tag in need_compare_tags:
+        a_tag_manifests = tag_manifests.get(tag, {})
+        b_tag_manifests = target_tag_manifests.get(tag, {})
+
+        if not equal_manifests(a_tag_manifests, b_tag_manifests):
+            new_updated_tags.add(tag)
+
+    for update_tag in list(new_add_tags | new_updated_tags):
+        src_image = "{}:{}".format(name, update_tag) if namespace == 'library' else "{}/{}:{}".format(namespace, name,
+                                                                                                      update_tag)
+        dst_image = "{}/{}/{}:{}".format(TARGET_REGISTRY_ENDPOINT, target_namespace, target_name, update_tag)
+        blueprint = create_sync_blue_print(src_image, dst_image)
+        sync_image(blueprint)
+
+        if namespace == 'library':
+            dst_image_2 = "{}/{}:{}".format(TARGET_REGISTRY_ENDPOINT, target_name, update_tag)
             blueprint2 = create_sync_blue_print(src_image, dst_image_2)
-            sync_image(blueprint)
             sync_image(blueprint2)
+
+
+def _load_image_name_convert_dict():
+    data = {}
+    with open(IMAGE_NAME_CONVERT_LIST_PATH, "r") as f:
+        for line in f:
+            k, v = line.strip().split("->")
+            data[k.strip()] = v.strip()
+    return data
+
+
+image_name_convert_dict = _load_image_name_convert_dict()
+
+
+def _convert_image(image_name):
+    '''
+
+    :param image_name: library/ubuntu -> library ubuntu
+                        tutum/ubuntu -> {TARGET_THIRD_NAMESPACE} ubuntu
+    :return:
+    '''
+    _, namespace, name, _ = DockerHubClient.parse_repo(image_name)
+
+    if namespace == 'library':
+        return namespace, name
+
+    else:
+        dst_image_name = image_name_convert_dict.get("{}/{}".format(namespace, name)) or "{}/{}".format(namespace, name)
+
+        _, namespace, name, _ = DockerHubClient.parse_repo(dst_image_name)
+        return namespace, name
+
+
+def sync_all_library_images():
+    image_list = read_from_file(LIBRARY_IMAGE_LIST_PATH)
+    map(sync_image_from_dockerhub, image_list)
+
+
+def sync_all_third_party_images():
+    third_party_image_list = read_from_file(THIRD_PARTY_LIST_PATH)
+    map(sync_image_from_dockerhub, third_party_image_list)
+
+
 
 
 def test_create():
