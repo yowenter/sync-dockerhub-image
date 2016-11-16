@@ -14,4 +14,4 @@ COPY ./requirements.txt /usr/src/app/
 RUN pip install  -r /usr/src/app/requirements.txt
 COPY . /usr/src/app
 
-CMD ["./consumer.sh"]
+CMD ["sh","consumer.sh"]
