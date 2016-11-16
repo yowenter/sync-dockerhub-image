@@ -4,41 +4,62 @@ import requests
 
 
 class DockerHubClient(requests.Session):
+    def __init__(self, registry_url=None, timeout=30):
+        self.base_url = registry_url
+        self._headers = {'Content-Type': 'application/json'}
+        self._timeout = timeout
+        super(DockerHubClient, self).__init__()
 
-	def __init__(self, registry_url=None):
-		self.base_url = registry_url
-		self._headers = {'Content-Type': 'application/json'}
+    @staticmethod
+    def authorize(www_authenticate, uid=None, pwd=None):
+        # todo support basic auth
+        auth_url = re.search('realm="(.*?)"', www_authenticate).groups()[0]
+        service = re.search('service="(.*?)"', www_authenticate).groups()[0]
+        scope = re.search('scope="(.*?)"', www_authenticate).groups()[0]
 
-	@staticmethod
-	def authorize(www-authenticate,uid=None,pwd=None):
-		# todo support basic auth
-		auth_url = re.search('realm="(.*?)"', a).groups()[0]
-		service = re.search('service="(.*?)"', a).groups()[0]
-		scope = re.search('scope="(.*?)"', a).groups()[0]
+        data = requests.get(
+            auth_url, params={'service': service, 'scope': scope}).json()
+        return data['token']
 
+    def manifests(self, namespace, name, tag, retried=0):
+        url = self._url('/{}/{}/manifests/{}'.format(namespace, name, tag))
+        response = self._get(url)
+        if response.headers.get('www-authenticate') and response.status_code == 401 and retried < 4:
+            token = self.authorize(response.headers['www-authenticate'])
+            self._headers.update({'Authorization': "Bearer {}".format(token)})
+            return self.manifests(namespace, name, tag, retried + 1)
+        return self._result(response)
 
-		data = requests.get(auth_url, params={'service': service, 'scope': scope}).json()
-		return data['token']
+    def tags(self, namespace, name, retried=0):
+        url = self._url('/{}/{}/tags/list'.format(namespace, name))
+        response = self._get(url)
+        if response.headers.get('www-authenticate') and response.status_code == 401 and retried < 4:
+            token = self.authorize(response.headers['www-authenticate'])
+            self._headers.update({'Authorization': "Bearer {}".format(token)})
+            return self.tags(namespace, name, retried + 1)
+        return self._result(response)
 
+    @classmethod
+    def parse_repo(cls, repo):
+        repo = repo.strip()
+        tag = None
+        if len(repo.split(':')) == 2:
+            image, tag = repo.split(":")
+        else:
+            image = repo
 
+        if len(image.split('/')) == 3:
+            endpoint, namespace, name = image.split('/')
+        elif len(image.split('/')) == 2:
+            endpoint = None
+            namespace, name = image.split('/')
 
-	def manifests(self, namespace, name,tag):
-		url = self._url('/{}/{}/manifests/{}'.format(namespace,name,tag))
-		return self._get(url)
+        else:
+            name = image
+            namespace = 'library'
+            endpoint = None
 
-	def tags(self, namespace, name):
-		url = self._url('/{}/{}/tags/list'.format(namespace,name))
-		return self._get(url)
-
-
-	@classmethod(function)
-	def parse_repo(repo):
-		pass
-
-	@classmethod
-	def diff_repo(cls, a_repo, b_repo):
-		pass
-
+        return endpoint, namespace, name, tag
 
     def _url(self, path):
         return '{0}{1}'.format(self.base_url, path)
@@ -65,10 +86,8 @@ class DockerHubClient(requests.Session):
             return response.content
         return response.text
 
-
-    def _raise_for_status(self,resp):
-    	resp.raise_for_status()
-
+    def _raise_for_status(self, resp):
+        resp.raise_for_status()
 
     def _put(self, url, **kwargs):
         return self.put(url, **self._set_default_params(kwargs))
@@ -83,9 +102,3 @@ class DockerHubClient(requests.Session):
         kwargs.setdefault('verify', False)
         kwargs.setdefault('headers', self._headers)
         return kwargs
-
-
-
-
-
-
