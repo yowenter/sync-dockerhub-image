@@ -28,3 +28,6 @@ Distributed Sync from [DockerHub](http://hub.docker.com)  public images to self 
 # todo list
 
 * 同步完成后 删除遗留镜像
+* 不同 registry 之间迁移镜像
+* 监控
+* Command Tools
