@@ -121,13 +121,21 @@ def _convert_image(image_name):
 @docker_huey.periodic_task(crontab(hour=0))
 def sync_all_library_images():
     image_list = read_from_file(LIBRARY_IMAGE_LIST_PATH)
-    map(sync_image_from_dockerhub, image_list)
+    for image_name in image_list:
+        try:
+            sync_image_from_dockerhub(image_name)
+        except:
+            LOG.error("Create sync library image task failure .%s ", image_name, exc_info=True)
 
 
 @docker_huey.periodic_task(crontab(hour=20))
 def sync_all_third_party_images():
     third_party_image_list = read_from_file(THIRD_PARTY_LIST_PATH)
-    map(sync_image_from_dockerhub, third_party_image_list)
+    for image_name in third_party_image_list:
+        try:
+            sync_image_from_dockerhub(image_name)
+        except:
+            LOG.error("Create sync third party image task failure .%s ", image_name, exc_info=True)
 
 
 def test_create():
