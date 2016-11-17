@@ -28,4 +28,4 @@ class DockerClient:
     @staticmethod
     def rmi(image_name):
         result = subprocess.call(["docker", "rmi", image_name])
-        LOG.info("Docker remove image %s result %s", image_name, str(result))
+        LOG.info("Docker remove image %s .  result %s", image_name, str(result))
