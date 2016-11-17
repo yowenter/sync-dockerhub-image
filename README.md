@@ -11,7 +11,8 @@ Distributed Sync from [DockerHub](http://hub.docker.com)  public images to self 
 
 `image.list` ,要同步的 library 镜像
 
-`third_party.list`,  第三方镜像 需要同步的镜像
+`third_party.list`,  第三方镜像 需要同步的镜像.
+请注意，为了避免重复，镜像名最好以字母排序
 
 `image_name_convert.list` , dockerhub 非library 镜像 需要同步 到 namespace 的转换 .
 
