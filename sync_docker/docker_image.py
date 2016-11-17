@@ -1,4 +1,8 @@
+import logging
+
 import subprocess
+
+LOG = logging.getLogger(__name__)
 
 
 class DockerClient:
@@ -20,3 +24,8 @@ class DockerClient:
             ["docker", "tag", src_image_name, dst_image_name])
         if result != 0:
             raise Exception("tag image failure %s -> %s" % (src_image_name, dst_image_name))
+
+    @staticmethod
+    def rmi(image_name):
+        result = subprocess.call(["docker", "rmi", image_name])
+        LOG.info("Docker remove image %s result %s", image_name, str(result))
