@@ -89,10 +89,12 @@ class CleanStep(Step):
         return "Rmi Image %s , %s " % (self.src_image, self.dst_image)
 
 
-def create_sync_blue_print(src_image, dst_image):
+def create_sync_blue_print(src_image, dst_image, need_clean=True):
     pull_step = PullStep(src_image)
     tag_step = TagStep(src_image, dst_image)
     push_step = PushStep(dst_image)
-    clean_step = CleanStep(src_image, dst_image)
-
-    return BluePrint('sync.{}.{}'.format(src_image, dst_image), [pull_step, tag_step, push_step, clean_step])
+    if need_clean:
+        clean_step = CleanStep(src_image, dst_image)
+        return BluePrint('sync.{}.{}'.format(src_image, dst_image), [pull_step, tag_step, push_step, clean_step])
+    else:
+        return BluePrint('sync.{}.{}'.format(src_image, dst_image), [pull_step, tag_step, push_step])
