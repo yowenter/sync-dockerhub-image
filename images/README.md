@@ -1,0 +1,1 @@
+# 编辑完之后， 请执行 `sort_third_party_images.sh`

@@ -4,12 +4,12 @@ bijukunjummen/rabbitmq-server
 ceph/daemon
 codenvy/che
 discourse/discourse
+dockercloud/haproxy
 dorowu/ubuntu-desktop-lxde-vnc
 ehazlett/interlock
 erkules/galera
 exoplatform/exo-community
 garland/zookeeper
-gitlab/gitlab-ce
 gitlab/gitlab-ce
 gliderlabs/logspout
 gogs/gogs

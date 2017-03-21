@@ -21,7 +21,6 @@ websphere-liberty
 maven
 gcc
 erlang
-
 # service
 redis
 mongo
@@ -41,7 +40,6 @@ zookeeper
 rethinkdb
 jenkins
 memcached
-
 # popular application
 wordpress
 ghost
@@ -56,6 +54,5 @@ piwik
 consul
 crate
 notary
-django
 kong
 mono

@@ -78,12 +78,12 @@ def sync_image_from_dockerhub(image_name):
         src_image = "{}:{}".format(name, update_tag) if namespace == 'library' else "{}/{}:{}".format(namespace, name,
                                                                                                       update_tag)
         dst_image = "{}/{}/{}:{}".format(TARGET_REGISTRY, target_namespace, target_name, update_tag)
-        blueprint = create_sync_blue_print(src_image, dst_image, need_clean=namespace != 'library')
+        blueprint = create_sync_blue_print(src_image, dst_image, need_clean=(update_tag !='latest' and namespace !='library'))
         sync_image(blueprint)
 
         if namespace == 'library':
             dst_image_2 = "{}/{}:{}".format(TARGET_REGISTRY, target_name, update_tag)
-            blueprint2 = create_sync_blue_print(src_image, dst_image_2, need_clean=False)
+            blueprint2 = create_sync_blue_print(src_image, dst_image_2, need_clean=update_tag !='latest')
             sync_image(blueprint2)
 
 
